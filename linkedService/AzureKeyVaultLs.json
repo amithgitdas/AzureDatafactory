@@ -1,0 +1,11 @@
+{
+	"name": "AzureKeyVaultLs",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://devopskvalutdev.vault.azure.net/"
+		}
+	}
+}
