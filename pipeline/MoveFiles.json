@@ -37,6 +37,9 @@
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"recursive": true
+					},
+					"formatSettings": {
+						"type": "BinaryReadSettings"
 					}
 				}
 			},
@@ -211,13 +214,15 @@
 				"type": "String"
 			},
 			"SourceStore_Directory": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "source"
 			},
 			"DestinationStore_Location": {
 				"type": "String"
 			},
 			"DestinationStore_Directory": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "sink"
 			}
 		},
 		"annotations": [],
