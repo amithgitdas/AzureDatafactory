@@ -5,11 +5,11 @@
 		"factoryName": {
 			"value": "devopsdatafactrylrndev"
 		},
-		"AzureKeyVaultLs_properties_typeProperties_baseUrl": {
-			"value": "https://devopskvalutdev.vault.azure.net/"
-		},
-		"linkedServicestorage_properties_typeProperties_connectionString_secretName": {
+		"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
 			"value": "storageconnstringkey"
+		},
+		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
+			"value": "https://devopskvalut29dev.vault.azure.net/"
 		},
 		"containerUri": {
 			"value": ""

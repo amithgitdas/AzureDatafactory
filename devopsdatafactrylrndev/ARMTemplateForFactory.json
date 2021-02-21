@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "devopsdatafactrylrndev"
 		},
-		"AzureKeyVaultLs_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://devopskvalutdev.vault.azure.net/"
-		},
-		"linkedServicestorage_properties_typeProperties_connectionString_secretName": {
+		"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "storageconnstringkey"
+		},
+		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://devopskvalut29dev.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -21,17 +21,48 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/MoveFiles')]",
+			"name": "[concat(parameters('factoryName'), '/MoveFilesBetweenBlob')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Move files from one folder to another folder",
 				"activities": [
 					{
-						"name": "GetFileList",
-						"description": "Get the list of file",
-						"type": "GetMetadata",
+						"name": "SetFilename",
+						"type": "SetVariable",
 						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "srcfilename",
+							"value": "nyc_data"
+						}
+					},
+					{
+						"name": "SetContainerName",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "srcfilecontainer",
+							"value": "nycip"
+						}
+					},
+					{
+						"name": "NycDataCopy",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "SetFilename",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "SetContainerName",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -41,362 +72,150 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"dataset": {
-								"referenceName": "BinaryDataSource_Folder",
-								"type": "DatasetReference",
-								"parameters": {
-									"Container": {
-										"value": "@pipeline().parameters.SourceStore_Location",
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": {
+										"value": "@variables('srcfilecontainer')",
 										"type": "Expression"
 									},
-									"Directory": {
-										"value": "@pipeline().parameters.SourceStore_Directory",
+									"wildcardFileName": {
+										"value": "@concat(variables('srcfilename'),'.csv')",
 										"type": "Expression"
-									}
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
 								}
 							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
 							},
-							"formatSettings": {
-								"type": "BinaryReadSettings"
-							}
-						}
-					},
-					{
-						"name": "ForEachFile",
-						"description": "Iterate each file, and move them one by one.",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "FilterFiles",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('FilterFiles').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 20,
-							"activities": [
-								{
-									"name": "CopyAFile",
-									"description": "Copy a file from the source store to the destination store.",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
 										"source": {
-											"type": "BinarySource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true
-											},
-											"recursive": false
+											"type": "String",
+											"ordinal": 1
 										},
 										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"dataIntegrationUnits": 0
+											"path": "$['id']"
+										}
 									},
-									"inputs": [
-										{
-											"referenceName": "BinaryDataSource_File",
-											"type": "DatasetReference",
-											"parameters": {
-												"Container": {
-													"value": "@pipeline().parameters.SourceStore_Location",
-													"type": "Expression"
-												},
-												"Directory": {
-													"value": "@pipeline().parameters.SourceStore_Directory",
-													"type": "Expression"
-												},
-												"filename": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "BinaryDataDestination",
-											"type": "DatasetReference",
-											"parameters": {
-												"Container": {
-													"value": "@pipeline().parameters.DestinationStore_Location",
-													"type": "Expression"
-												},
-												"Directory": {
-													"value": "@pipeline().parameters.DestinationStore_Directory",
-													"type": "Expression"
-												},
-												"filename": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "DeleteAFile",
-									"description": "Delete a file from the source store",
-									"type": "Delete",
-									"dependsOn": [
-										{
-											"activity": "CopyAFile",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataset": {
-											"referenceName": "BinaryDataSource_File",
-											"type": "DatasetReference",
-											"parameters": {
-												"Container": {
-													"value": "@pipeline().parameters.SourceStore_Location",
-													"type": "Expression"
-												},
-												"Directory": {
-													"value": "@pipeline().parameters.SourceStore_Directory",
-													"type": "Expression"
-												},
-												"filename": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
 										},
-										"enableLogging": false,
-										"storeSettings": {
-											"type": "AzureBlobStorageReadSettings",
-											"recursive": true
+										"sink": {
+											"path": "$['pickup_hour']"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"path": "$['pickupdate']"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"path": "$['dropoffdate']"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"path": "$['dropoff_hour']"
 										}
 									}
-								}
-							]
-						}
-					},
-					{
-						"name": "FilterFiles",
-						"description": "Only files will be selected, the source-folders will not be selected.",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "GetFileList",
-								"dependencyConditions": [
-									"Succeeded"
 								]
 							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetFileList').output.childItems",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().type, 'File')",
-								"type": "Expression"
+						},
+						"inputs": [
+							{
+								"referenceName": "blobnyccsvdata",
+								"type": "DatasetReference",
+								"parameters": {}
 							}
-						}
+						],
+						"outputs": [
+							{
+								"referenceName": "blobjsondataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
-				"parameters": {
-					"SourceStore_Location": {
+				"variables": {
+					"srcfilecontainer": {
 						"type": "String"
 					},
-					"SourceStore_Directory": {
-						"type": "String",
-						"defaultValue": "source"
-					},
-					"DestinationStore_Location": {
+					"srcfilename": {
 						"type": "String"
 					},
-					"DestinationStore_Directory": {
-						"type": "String",
-						"defaultValue": "sink"
+					"srcoutput": {
+						"type": "String"
 					}
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-13T21:02:13Z"
+				"lastPublishTime": "2021-02-21T09:55:00Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/BinaryDataSource_Folder')]",
-				"[concat(variables('factoryId'), '/datasets/BinaryDataSource_File')]",
-				"[concat(variables('factoryId'), '/datasets/BinaryDataDestination')]"
+				"[concat(variables('factoryId'), '/datasets/blobnyccsvdata')]",
+				"[concat(variables('factoryId'), '/datasets/blobjsondataset')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/BinaryDataDestination')]",
+			"name": "[concat(parameters('factoryName'), '/blobnyccsvdata')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "It describes the destination store.",
 				"linkedServiceName": {
-					"referenceName": "linkedServicestorage",
+					"referenceName": "AzureBlobStorageLS",
 					"type": "LinkedServiceReference"
 				},
-				"parameters": {
-					"Container": {
-						"type": "String"
-					},
-					"Directory": {
-						"type": "String"
-					},
-					"filename": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
-				"type": "Binary",
+				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@{dataset().Directory}",
-							"type": "Expression"
-						},
-						"container": {
-							"value": "@{dataset().Container}",
-							"type": "Expression"
-						}
-					}
-				}
+						"container": "nycip"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/linkedServicestorage')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLS')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/BinaryDataSource_File')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "It describes the file in the data source store.",
-				"linkedServiceName": {
-					"referenceName": "linkedServicestorage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Container": {
-						"type": "String"
-					},
-					"Directory": {
-						"type": "String"
-					},
-					"filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().filename",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@{dataset().Directory}",
-							"type": "Expression"
-						},
-						"container": {
-							"value": "@{dataset().Container}",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/linkedServicestorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BinaryDataSource_Folder')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "It describes the folder in the data source store.",
-				"linkedServiceName": {
-					"referenceName": "linkedServicestorage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Container": {
-						"type": "String"
-					},
-					"Directory": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@{dataset().Directory}",
-							"type": "Expression"
-						},
-						"container": {
-							"value": "@{dataset().Container}",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/linkedServicestorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVaultLs')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVaultLs_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/linkedServicestorage')]",
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorageLS')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -406,15 +225,52 @@
 					"connectionString": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
-							"referenceName": "AzureKeyVaultLs",
+							"referenceName": "AzureKeyVaultLS",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('linkedServicestorage_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "[parameters('AzureBlobStorageLS_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVaultLs')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVaultLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVaultLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVaultLS_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/blobjsondataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorageLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "nyc_op.json",
+						"container": "nycop"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLS')]"
 			]
 		}
 	]
