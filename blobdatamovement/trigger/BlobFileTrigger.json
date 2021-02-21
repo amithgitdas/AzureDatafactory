@@ -1,0 +1,28 @@
+{
+	"name": "BlobFileTrigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "CopyBlobToSQL",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"countrycode": "WASH"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/eventfordatafactory/blobs/",
+			"blobPathEndsWith": ".tkn",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/b8708618-8a30-4a40-9df0-c55d351fe2be/resourceGroups/devopsrsrclrndev/providers/Microsoft.Storage/storageAccounts/devopsstoragelrndev",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
