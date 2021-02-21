@@ -5,11 +5,29 @@
 		"factoryName": {
 			"value": "devopsdatafactrylrndev"
 		},
+		"AzureSqlDBRunDateLS_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorageLS_accountKey": {
+			"value": ""
+		},
 		"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
 			"value": "storageconnstringkey"
 		},
 		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
 			"value": "https://devopskvalut29dev.vault.azure.net/"
+		},
+		"AzureKeyVaultSQLDB_properties_typeProperties_baseUrl": {
+			"value": "https://sqldbvlt.vault.azure.net/"
+		},
+		"BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode": {
+			"value": "WASH"
+		},
+		"BlobFileTrigger_properties_typeProperties_scope": {
+			"value": "/subscriptions/b8708618-8a30-4a40-9df0-c55d351fe2be/resourceGroups/devopsrsrclrndev/providers/Microsoft.Storage/storageAccounts/devopsstoragelrndev"
+		},
+		"AzureDataLakeStorageLS_properties_typeProperties_url": {
+			"value": "https://devopsstoragelrndev.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"value": ""

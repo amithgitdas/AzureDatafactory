@@ -6,38 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "devopsdatafactrylrndev"
-		},
-		"AzureSqlDBRunDateLS_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDBRunDateLS'"
-		},
-		"AzureDataLakeStorageLS_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageLS'"
-		},
-		"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "storageconnstringkey"
-		},
-		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://devopskvalut29dev.vault.azure.net/"
-		},
-		"AzureKeyVaultSQLDB_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://sqldbvlt.vault.azure.net/"
-		},
-		"BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode": {
-			"type": "string",
-			"defaultValue": "WASH"
-		},
-		"BlobFileTrigger_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/b8708618-8a30-4a40-9df0-c55d351fe2be/resourceGroups/devopsrsrclrndev/providers/Microsoft.Storage/storageAccounts/devopsstoragelrndev"
-		},
-		"AzureDataLakeStorageLS_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://devopsstoragelrndev.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -74,8 +42,7 @@
 							},
 							"dataset": {
 								"referenceName": "RunDateSQLDB",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						}
 					},
@@ -242,15 +209,13 @@
 						"inputs": [
 							{
 								"referenceName": "RunDateSQLDB",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "AzureCSVDataset",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -276,8 +241,7 @@
 						"typeProperties": {
 							"dataset": {
 								"referenceName": "EventDataset",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							},
 							"enableLogging": false,
 							"storeSettings": {
@@ -302,245 +266,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/MoveFilesBetweenBlob')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "CopyBlobdata",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "JsonSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "JsonWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "pickupdate",
-											"type": "String"
-										},
-										"sink": {
-											"path": "$['picupdate']"
-										}
-									},
-									{
-										"source": {
-											"name": "id",
-											"type": "String"
-										},
-										"sink": {
-											"path": "$['id']"
-										}
-									},
-									{
-										"source": {
-											"name": "pickup_hour",
-											"type": "String"
-										},
-										"sink": {
-											"path": "$['pickuphour']"
-										}
-									}
-								]
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "nycinput",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "nycouput",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"variables": {
-					"srcfilecontainer": {
-						"type": "String"
-					},
-					"srcfilename": {
-						"type": "String"
-					},
-					"srcoutput": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-21T09:55:00Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/nycinput')]",
-				"[concat(variables('factoryId'), '/datasets/nycouput')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/nycinput')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorageLS",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "nyc_data.csv",
-						"container": "nycip"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "id",
-						"type": "String"
-					},
-					{
-						"name": "pickup_hour",
-						"type": "String"
-					},
-					{
-						"name": "pickupdate",
-						"type": "String"
-					},
-					{
-						"name": "dropoffdate",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_hour",
-						"type": "String"
-					},
-					{
-						"name": "pickup_lat",
-						"type": "String"
-					},
-					{
-						"name": "pickup_lang",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_lat",
-						"type": "String"
-					},
-					{
-						"name": "dropoff_lan",
-						"type": "String"
-					},
-					{
-						"name": "indicator",
-						"type": "String"
-					},
-					{
-						"name": "distnace",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/nycouput')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorageLS",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "nycop"
-					}
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorageLS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVaultLS",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('AzureBlobStorageLS_properties_typeProperties_connectionString_secretName')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVaultLS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureKeyVaultLS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVaultLS_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureKeyVaultSQLDB')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -548,20 +273,7 @@
 				"annotations": [],
 				"type": "AzureKeyVault",
 				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVaultSQLDB_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDBRunDateLS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDBRunDateLS_connectionString')]"
+					"baseUrl": "https://sqldbvlt.vault.azure.net/"
 				}
 			},
 			"dependsOn": []
@@ -592,9 +304,7 @@
 					"table": "run_date_tbl"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDBRunDateLS')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureCSVDataset')]",
@@ -618,9 +328,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageLS')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/BlobFileTrigger')]",
@@ -636,7 +344,7 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"countrycode": "[parameters('BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode')]"
+							"countrycode": "WASH"
 						}
 					}
 				],
@@ -645,7 +353,7 @@
 					"blobPathBeginsWith": "/eventfordatafactory/blobs/",
 					"blobPathEndsWith": ".tkn",
 					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('BlobFileTrigger_properties_typeProperties_scope')]",
+					"scope": "/subscriptions/b8708618-8a30-4a40-9df0-c55d351fe2be/resourceGroups/devopsrsrclrndev/providers/Microsoft.Storage/storageAccounts/devopsstoragelrndev",
 					"events": [
 						"Microsoft.Storage.BlobCreated"
 					]
@@ -663,10 +371,10 @@
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorageLS_properties_typeProperties_url')]",
+					"url": "https://devopsstoragelrndev.dfs.core.windows.net",
 					"accountKey": {
 						"type": "SecureString",
-						"value": "[parameters('AzureDataLakeStorageLS_accountKey')]"
+						"value": "**********"
 					}
 				}
 			},

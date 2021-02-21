@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "devopsdatafactrylrndev"
 		},
+		"AzureSqlDBRunDateLS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDBRunDateLS'"
+		},
+		"AzureDataLakeStorageLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageLS'"
+		},
 		"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "storageconnstringkey"
@@ -14,6 +22,22 @@
 		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://devopskvalut29dev.vault.azure.net/"
+		},
+		"AzureKeyVaultSQLDB_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://sqldbvlt.vault.azure.net/"
+		},
+		"BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode": {
+			"type": "string",
+			"defaultValue": "WASH"
+		},
+		"BlobFileTrigger_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/b8708618-8a30-4a40-9df0-c55d351fe2be/resourceGroups/devopsrsrclrndev/providers/Microsoft.Storage/storageAccounts/devopsstoragelrndev"
+		},
+		"AzureDataLakeStorageLS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://devopsstoragelrndev.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -42,11 +66,29 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureSqlDBRunDateLS_connectionString": {
+						"value": "[parameters('AzureSqlDBRunDateLS_connectionString')]"
+					},
+					"AzureDataLakeStorageLS_accountKey": {
+						"value": "[parameters('AzureDataLakeStorageLS_accountKey')]"
+					},
 					"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKeyVaultLS_properties_typeProperties_baseUrl')]"
 					},
+					"AzureKeyVaultSQLDB_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVaultSQLDB_properties_typeProperties_baseUrl')]"
+					},
+					"AzureDataLakeStorageLS_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorageLS_properties_typeProperties_url')]"
+					},
 					"AzureBlobStorageLS_properties_typeProperties_connectionString_secretName": {
 						"value": "[parameters('AzureBlobStorageLS_properties_typeProperties_connectionString_secretName')]"
+					},
+					"BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode": {
+						"value": "[parameters('BlobFileTrigger_properties_CopyBlobToSQL_parameters_countrycode')]"
+					},
+					"BlobFileTrigger_properties_typeProperties_scope": {
+						"value": "[parameters('BlobFileTrigger_properties_typeProperties_scope')]"
 					}
 				}
 			},
