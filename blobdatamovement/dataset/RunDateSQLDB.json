@@ -1,0 +1,25 @@
+{
+	"name": "RunDateSQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDBRunDateLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "countrycode",
+				"type": "varchar"
+			},
+			{
+				"name": "countryname",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "SalesLT",
+			"table": "run_date_tbl"
+		}
+	}
+}
