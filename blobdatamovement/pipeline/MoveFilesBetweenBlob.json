@@ -1,0 +1,38 @@
+{
+	"name": "MoveFilesBetweenBlob",
+	"properties": {
+		"activities": [
+			{
+				"name": "SetFilename",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "srcfilename",
+					"value": "nyc_data"
+				}
+			},
+			{
+				"name": "SetContainerName",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "srcfilecontainer",
+					"value": "nycip"
+				}
+			}
+		],
+		"variables": {
+			"srcfilecontainer": {
+				"type": "String"
+			},
+			"srcfilename": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-21T09:55:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
