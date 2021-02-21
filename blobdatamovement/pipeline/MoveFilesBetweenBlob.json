@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "NycDataCopy",
+				"name": "CopyBlobdata",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -41,8 +41,17 @@
 						"mappings": [
 							{
 								"source": {
-									"type": "String",
-									"ordinal": 1
+									"name": "pickupdate",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['picupdate']"
+								}
+							},
+							{
+								"source": {
+									"name": "id",
+									"type": "String"
 								},
 								"sink": {
 									"path": "$['id']"
@@ -50,38 +59,11 @@
 							},
 							{
 								"source": {
-									"type": "String",
-									"ordinal": 2
+									"name": "pickup_hour",
+									"type": "String"
 								},
 								"sink": {
-									"path": "$['pickup_hour']"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"path": "$['pickupdate']"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"path": "$['dropoffdate']"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 5
-								},
-								"sink": {
-									"path": "$['dropoff_hour']"
+									"path": "$['pickuphour']"
 								}
 							}
 						]
@@ -89,13 +71,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "blobnyccsvdata",
+						"referenceName": "nycinput",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "Jsondataset",
+						"referenceName": "nycouput",
 						"type": "DatasetReference"
 					}
 				]

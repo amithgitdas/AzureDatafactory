@@ -1,0 +1,68 @@
+{
+	"name": "nycinput",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "nyc_data.csv",
+				"container": "nycip"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "pickup_hour",
+				"type": "String"
+			},
+			{
+				"name": "pickupdate",
+				"type": "String"
+			},
+			{
+				"name": "dropoffdate",
+				"type": "String"
+			},
+			{
+				"name": "dropoff_hour",
+				"type": "String"
+			},
+			{
+				"name": "pickup_lat",
+				"type": "String"
+			},
+			{
+				"name": "pickup_lang",
+				"type": "String"
+			},
+			{
+				"name": "dropoff_lat",
+				"type": "String"
+			},
+			{
+				"name": "dropoff_lan",
+				"type": "String"
+			},
+			{
+				"name": "indicator",
+				"type": "String"
+			},
+			{
+				"name": "distnace",
+				"type": "String"
+			}
+		]
+	}
+}
