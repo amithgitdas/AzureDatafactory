@@ -69,10 +69,12 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": "nyc_data.csv",
 						"container": "nycip"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
@@ -95,7 +97,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "nyc_op.json",
 						"container": "nycop"
 					}
 				},
@@ -112,42 +113,9 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "SetFilename",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "srcfilename",
-							"value": "nyc_data"
-						}
-					},
-					{
-						"name": "SetContainerName",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "srcfilecontainer",
-							"value": "nycip"
-						}
-					},
-					{
 						"name": "NycDataCopy",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "SetFilename",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "SetContainerName",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
 							"retry": 0,
@@ -162,14 +130,6 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": {
-										"value": "@variables('srcfilecontainer')",
-										"type": "Expression"
-									},
-									"wildcardFileName": {
-										"value": "@concat(variables('srcfilename'),'.csv')",
-										"type": "Expression"
-									},
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
