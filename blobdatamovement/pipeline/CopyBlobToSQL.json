@@ -31,27 +31,11 @@
 				}
 			},
 			{
-				"name": "WaitForMin",
-				"type": "Wait",
-				"dependsOn": [
-					{
-						"activity": "Rundatelookup",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"waitTimeInSeconds": 60
-				}
-			},
-			{
 				"name": "CopySQLData",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "WaitForMin",
+						"activity": "DeleteEventToken",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -218,6 +202,38 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "DeleteEventToken",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "Rundatelookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "EventDataset",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
 			}
 		],
 		"parameters": {
