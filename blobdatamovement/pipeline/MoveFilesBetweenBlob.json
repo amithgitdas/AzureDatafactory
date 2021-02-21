@@ -27,13 +27,14 @@
 						}
 					},
 					"sink": {
-						"type": "JsonSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings",
-							"copyBehavior": "MergeFiles"
+							"type": "AzureBlobStorageWriteSettings"
 						},
 						"formatSettings": {
-							"type": "JsonWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false,
@@ -43,6 +44,7 @@
 							{
 								"source": {
 									"type": "String",
+									"physicalType": "String",
 									"ordinal": 1
 								},
 								"sink": {
@@ -52,6 +54,7 @@
 							{
 								"source": {
 									"type": "String",
+									"physicalType": "String",
 									"ordinal": 2
 								},
 								"sink": {
@@ -61,6 +64,7 @@
 							{
 								"source": {
 									"type": "String",
+									"physicalType": "String",
 									"ordinal": 3
 								},
 								"sink": {
@@ -70,6 +74,7 @@
 							{
 								"source": {
 									"type": "String",
+									"physicalType": "String",
 									"ordinal": 4
 								},
 								"sink": {
@@ -79,13 +84,19 @@
 							{
 								"source": {
 									"type": "String",
+									"physicalType": "String",
 									"ordinal": 5
 								},
 								"sink": {
 									"path": "$['dropoff_hour']"
 								}
 							}
-						]
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
 				},
 				"inputs": [
@@ -96,7 +107,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "blobjsondataset",
+						"referenceName": "blobnyccsvdata",
 						"type": "DatasetReference"
 					}
 				]
