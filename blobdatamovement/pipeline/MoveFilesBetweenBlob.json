@@ -37,12 +37,6 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
-					},
-					{
-						"activity": "Setoutputcontainer",
-						"dependencyConditions": [
-							"Succeeded"
-						]
 					}
 				],
 				"policy": {
@@ -76,7 +70,8 @@
 					"sink": {
 						"type": "JsonSink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
+							"type": "AzureBlobStorageWriteSettings",
+							"copyBehavior": "MergeFiles"
 						},
 						"formatSettings": {
 							"type": "JsonWriteSettings"
@@ -146,16 +141,6 @@
 						"type": "DatasetReference"
 					}
 				]
-			},
-			{
-				"name": "Setoutputcontainer",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "srcoutput",
-					"value": "nycop"
-				}
 			}
 		],
 		"variables": {
